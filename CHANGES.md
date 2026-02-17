@@ -44,7 +44,6 @@ ml-positional-encoding/
 ├── README.md           # Personalized documentation
 ├── QUICKSTART.md       # Simple quick start
 ├── requirements.txt
-├── verify_setup.py
 ├── LICENSE
 ├── .gitignore
 ├── src/

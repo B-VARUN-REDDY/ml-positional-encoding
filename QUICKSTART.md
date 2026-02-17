@@ -15,6 +15,13 @@ venv\Scripts\Activate.ps1  # Windows
 pip install -r requirements.txt
 ```
 
+## Quick Verify
+
+```bash
+python scripts/quick_demo.py          # 60-second full system check
+jupyter notebook notebooks/demo.ipynb # Interactive walkthrough
+```
+
 ## Test
 
 ```bash
