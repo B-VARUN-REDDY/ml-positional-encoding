@@ -189,8 +189,12 @@ python scripts/compare_all.py
 ### Run Tests
 
 ```bash
-python tests/test_positional_encoding.py
+python -m pytest
 ```
+
+### Interactive Demo
+
+Open `notebooks/demo.ipynb` in Jupyter/VS Code for an interactive walkthrough.
 
 ---
 

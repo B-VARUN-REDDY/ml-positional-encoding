@@ -18,7 +18,8 @@ import seaborn as sns
 from typing import Dict, List
 import argparse
 
-from train import main as train_main
+from train import train_model
+from types import SimpleNamespace
 
 
 def compare_all_methods(
@@ -49,23 +50,6 @@ def compare_all_methods(
         'none'  # Ablation study
     ]
     
-    # Shared hyperparameters
-    base_args = [
-        '--d_model', '128',
-        '--num_heads', '8',
-        '--num_layers', '3',
-        '--batch_size', '32',
-        '--lr', '0.001',
-        '--train_samples', '5000',
-        '--val_samples', '1000',
-        '--seq_len', '32',
-        '--vocab_size', '20',
-        '--num_epochs', str(num_epochs),
-        '--device', device,
-        '--output_dir', output_dir,
-        '--data_dir', str(Path(__file__).parent.parent / 'data')
-    ]
-    
     results = {}
     
     print("="*80)
@@ -82,42 +66,60 @@ def compare_all_methods(
         print(f"# [{i}/{len(methods)}] Training: {method.upper()}")
         print(f"{'#'*80}\n")
         
-        # Prepare arguments
-        sys.argv = ['train.py', '--pos_encoding', method] + base_args
+        # Prepare arguments object
+        args = SimpleNamespace(
+            pos_encoding=method,
+            d_model=128,
+            num_heads=8,
+            num_layers=3,
+            dropout=0.1,
+            dataset_type='pattern',
+            seq_len=32,
+            vocab_size=20,
+            train_samples=5000,
+            val_samples=1000,
+            data_dir=str(Path(__file__).parent.parent / 'data'),
+            batch_size=32,
+            num_epochs=num_epochs,
+            lr=0.001,
+            weight_decay=1e-5,
+            device=device,
+            seed=42,
+            output_dir=output_dir,
+            visualize_attention=False
+        )
         
         try:
-            # Run training
-            train_main()
+            # Run training directly
+            history, best_val = train_model(args)
             
-            # Load results
+            # Load results (redundant since we have history returned, but keeping consistent format)
             exp_name = f"{method}_d128_h8_l3"
             result_dir = output_path / exp_name
             
-            with open(result_dir / 'training_history.json', 'r') as f:
-                history = json.load(f)
+            # We can use the returned history directly or reload from file
+            # Let's verify file exists to ensure saving worked
+            if not (result_dir / 'training_history.json').exists():
+                 raise FileNotFoundError("Training history not saved")
             
             with open(result_dir / 'config.json', 'r') as f:
                 config = json.load(f)
             
-            # Extract metrics
-            best_val_acc = max(history['val_acc'])
-            best_epoch = history['val_acc'].index(best_val_acc) + 1
-            final_val_acc = history['val_acc'][-1]
-            final_train_acc = history['train_acc'][-1]
-            
             results[method] = {
-                'best_val_acc': best_val_acc,
-                'best_epoch': best_epoch,
-                'final_val_acc': final_val_acc,
-                'final_train_acc': final_train_acc,
+                'best_val_acc': best_val,
+                'best_epoch': history['val_acc'].index(max(history['val_acc'])) + 1,
+                'final_val_acc': history['val_acc'][-1],
+                'final_train_acc': history['train_acc'][-1],
                 'history': history,
                 'config': config
             }
             
-            print(f"\n✓ {method}: Best Val Acc = {best_val_acc:.2f}% (epoch {best_epoch})")
+            print(f"\n[OK] {method}: Best Val Acc = {best_val:.2f}%")
             
         except Exception as e:
-            print(f"\n✗ {method} failed: {e}")
+            print(f"\n[FAIL] {method} failed: {e}")
+            import traceback
+            traceback.print_exc()
             results[method] = None
     
     print("\n" + "="*80)
@@ -130,7 +132,7 @@ def compare_all_methods(
     # Generate summary table
     generate_summary_table(results, output_path)
     
-    print(f"\n✓ All results saved to: {output_path}")
+    print(f"\n[OK] All results saved to: {output_path}")
     print("="*80 + "\n")
 
 
@@ -147,6 +149,10 @@ def generate_comparison_plots(results: Dict, output_dir: Path):
     # Filter out failed methods
     valid_results = {k: v for k, v in results.items() if v is not None}
     
+    if not valid_results:
+        print("No valid results to plot.")
+        return
+
     # Plot 1: Validation Accuracy over epochs
     ax = axes[0, 0]
     for method, data in valid_results.items():
@@ -220,7 +226,7 @@ def generate_comparison_plots(results: Dict, output_dir: Path):
     plt.savefig(save_path, dpi=300, bbox_inches='tight')
     plt.close()
     
-    print(f"✓ Saved comparison plots to {save_path}")
+    print(f"[OK] Saved comparison plots to {save_path}")
 
 
 def generate_summary_table(results: Dict, output_dir: Path):
@@ -229,6 +235,10 @@ def generate_summary_table(results: Dict, output_dir: Path):
     # Filter out failed methods
     valid_results = {k: v for k, v in results.items() if v is not None}
     
+    if not valid_results:
+        print("No valid results for summary table.")
+        return
+
     # Create DataFrame
     data = []
     for method, res in valid_results.items():
@@ -250,7 +260,7 @@ def generate_summary_table(results: Dict, output_dir: Path):
     # Save as CSV
     csv_path = output_dir / 'comparison_summary.csv'
     df.to_csv(csv_path, index=False)
-    print(f"✓ Saved summary table to {csv_path}")
+    print(f"[OK] Saved summary table to {csv_path}")
     
     # Save as markdown
     md_path = output_dir / 'comparison_summary.md'
@@ -279,7 +289,7 @@ def generate_summary_table(results: Dict, output_dir: Path):
         f.write("4. **Sinusoidal** offers parameter-free baseline\n")
         f.write("5. **No Position** demonstrates critical importance of positional information\n")
     
-    print(f"✓ Saved markdown summary to {md_path}")
+    print(f"[OK] Saved markdown summary to {md_path}")
     
     # Print table to console
     print("\n" + "="*80)

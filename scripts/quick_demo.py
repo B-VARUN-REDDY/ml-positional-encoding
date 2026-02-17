@@ -10,7 +10,11 @@ Usage:
 """
 
 import sys
-sys.path.insert(0, 'src')
+from pathlib import Path
+
+# Get project root (2 levels up from scripts/quick_demo.py)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT / 'src'))
 
 import torch
 import numpy as np
@@ -67,9 +71,11 @@ try:
     # Check physical files
     import os
     data_dir = None
-    if os.path.exists('data/train/train_data.pkl'):
-        data_dir = 'data'
-        print(f"   ✅ Data files found in data/ (using them)")
+    data_path = PROJECT_ROOT / 'data'
+    
+    if (data_path / 'train' / 'train_data.pkl').exists():
+        data_dir = str(data_path)
+        print(f"   ✅ Data files found in {data_path} (using them)")
     
     train_loader, val_loader, info = create_dataloaders(
         dataset_type='pattern',

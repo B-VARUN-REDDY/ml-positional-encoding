@@ -156,7 +156,7 @@ class Trainer:
         """
         print(f"\nStarting training for {num_epochs} epochs...")
         print(f"Device: {self.device}")
-        print(f"Model: {self.config['pos_encoding_type']}")
+        print(f"Model: {self.config.get('pos_encoding', self.config.get('pos_encoding_type', 'Unknown'))}")
         print(f"Output directory: {self.output_dir}")
         
         start_time = time.time()
@@ -189,7 +189,7 @@ class Trainer:
                 self.best_val_acc = val_acc
                 self.best_epoch = epoch
                 self.save_checkpoint('best_model.pt', epoch)
-                print(f"  ✓ New best model! (Val Acc: {val_acc:.2f}%)")
+                print(f"  [OK] New best model! (Val Acc: {val_acc:.2f}%)")
             
             # Save latest checkpoint
             if epoch % 5 == 0:
@@ -310,60 +310,13 @@ class Trainer:
         print(f"Saved attention visualizations to {self.vis_dir}")
 
 
-def main():
-    """Main training function."""
-    parser = argparse.ArgumentParser(description='Train positional encoding models')
+def train_model(args):
+    """
+    Run training with provided arguments.
     
-    # Model arguments
-    parser.add_argument('--pos_encoding', type=str, default='learned_absolute',
-                        choices=['learned_absolute', 'learned_relative', 'continuous', 'sinusoidal', 'none'],
-                        help='Type of positional encoding')
-    parser.add_argument('--d_model', type=int, default=128,
-                        help='Model dimension')
-    parser.add_argument('--num_heads', type=int, default=8,
-                        help='Number of attention heads')
-    parser.add_argument('--num_layers', type=int, default=3,
-                        help='Number of transformer layers')
-    parser.add_argument('--dropout', type=float, default=0.1,
-                        help='Dropout probability')
-    
-    # Dataset arguments
-    parser.add_argument('--dataset_type', type=str, default='pattern',
-                        choices=['pattern', 'sorting', 'distance'],
-                        help='Type of dataset')
-    parser.add_argument('--seq_len', type=int, default=32,
-                        help='Sequence length')
-    parser.add_argument('--vocab_size', type=int, default=20,
-                        help='Vocabulary size')
-    parser.add_argument('--train_samples', type=int, default=5000,
-                        help='Number of training samples')
-    parser.add_argument('--val_samples', type=int, default=1000,
-                        help='Number of validation samples')
-    parser.add_argument('--data_dir', type=str, default=None,
-                        help='Path to data directory (optional)')
-
-    # Training arguments
-    parser.add_argument('--batch_size', type=int, default=32,
-                        help='Batch size')
-    parser.add_argument('--num_epochs', type=int, default=20,
-                        help='Number of epochs')
-    parser.add_argument('--lr', type=float, default=1e-3,
-                        help='Learning rate')
-    parser.add_argument('--weight_decay', type=float, default=1e-5,
-                        help='Weight decay')
-    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
-                        help='Device to train on')
-    parser.add_argument('--seed', type=int, default=42,
-                        help='Random seed')
-    
-    # Output arguments
-    parser.add_argument('--output_dir', type=str, default='experiments/results',
-                        help='Output directory')
-    parser.add_argument('--visualize_attention', action='store_true',
-                        help='Visualize attention patterns after training')
-    
-    args = parser.parse_args()
-    
+    Args:
+        args: Namespace or object with necessary attributes
+    """
     # Set random seeds
     torch.manual_seed(args.seed)
     np.random.seed(args.seed)
@@ -376,7 +329,11 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # Save configuration
-    config = vars(args)
+    if isinstance(args, argparse.Namespace):
+        config = vars(args)
+    else:
+        config = vars(args)
+        
     with open(output_dir / 'config.json', 'w') as f:
         json.dump(config, f, indent=2)
 
@@ -455,6 +412,65 @@ def main():
     print(f"Best epoch: {trainer.best_epoch}")
     print(f"Output directory: {output_dir}")
     print("="*60 + "\n")
+    
+    return history, trainer.best_val_acc
+
+
+def main():
+    """Main training function."""
+    parser = argparse.ArgumentParser(description='Train positional encoding models')
+    
+    # Model arguments
+    parser.add_argument('--pos_encoding', type=str, default='learned_absolute',
+                        choices=['learned_absolute', 'learned_relative', 'continuous', 'sinusoidal', 'none'],
+                        help='Type of positional encoding')
+    parser.add_argument('--d_model', type=int, default=128,
+                        help='Model dimension')
+    parser.add_argument('--num_heads', type=int, default=8,
+                        help='Number of attention heads')
+    parser.add_argument('--num_layers', type=int, default=3,
+                        help='Number of transformer layers')
+    parser.add_argument('--dropout', type=float, default=0.1,
+                        help='Dropout probability')
+    
+    # Dataset arguments
+    parser.add_argument('--dataset_type', type=str, default='pattern',
+                        choices=['pattern', 'sorting', 'distance'],
+                        help='Type of dataset')
+    parser.add_argument('--seq_len', type=int, default=32,
+                        help='Sequence length')
+    parser.add_argument('--vocab_size', type=int, default=20,
+                        help='Vocabulary size')
+    parser.add_argument('--train_samples', type=int, default=5000,
+                        help='Number of training samples')
+    parser.add_argument('--val_samples', type=int, default=1000,
+                        help='Number of validation samples')
+    parser.add_argument('--data_dir', type=str, default=None,
+                        help='Path to data directory (optional)')
+
+    # Training arguments
+    parser.add_argument('--batch_size', type=int, default=32,
+                        help='Batch size')
+    parser.add_argument('--num_epochs', type=int, default=20,
+                        help='Number of epochs')
+    parser.add_argument('--lr', type=float, default=1e-3,
+                        help='Learning rate')
+    parser.add_argument('--weight_decay', type=float, default=1e-5,
+                        help='Weight decay')
+    parser.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu',
+                        help='Device to train on')
+    parser.add_argument('--seed', type=int, default=42,
+                        help='Random seed')
+    
+    # Output arguments
+    parser.add_argument('--output_dir', type=str, default='experiments/results',
+                        help='Output directory')
+    parser.add_argument('--visualize_attention', action='store_true',
+                        help='Visualize attention patterns after training')
+    
+    args = parser.parse_args()
+    
+    train_model(args)
 
 
 if __name__ == "__main__":

@@ -101,8 +101,8 @@ class PositionAwarePatternDataset(Dataset):
         sequences = []
         labels = []
         
-        # Calculate samples per class
-        samples_per_class = self.num_samples // self.num_classes
+        # Calculate samples per class (with ceiling division to ensure we have enough)
+        samples_per_class = (self.num_samples + self.num_classes - 1) // self.num_classes
         
         for class_idx in range(self.num_classes):
             pattern = self.patterns[class_idx]
@@ -133,6 +133,11 @@ class PositionAwarePatternDataset(Dataset):
                     sequences.append(seq)
                     labels.append(class_idx)
                     class_samples += 1
+        
+        # Trim to exact num_samples (if we generated extra)
+        if len(sequences) > self.num_samples:
+            sequences = sequences[:self.num_samples]
+            labels = labels[:self.num_samples]
         
         # Convert to tensors
         sequences = torch.tensor(np.array(sequences), dtype=torch.long)
@@ -348,12 +353,12 @@ def create_dataloaders(
             # Load train data
             with open(data_path / 'train' / 'train_data.pkl', 'rb') as f:
                 raw_train = pickle.load(f)
-                train_data = (torch.tensor(raw_train['sequences']), torch.tensor(raw_train['labels']))
+                train_data = (torch.tensor(raw_train['sequences'], dtype=torch.long), torch.tensor(raw_train['labels'], dtype=torch.long))
             
             # Load val data
             with open(data_path / 'val' / 'val_data.pkl', 'rb') as f:
                 raw_val = pickle.load(f)
-                val_data = (torch.tensor(raw_val['sequences']), torch.tensor(raw_val['labels']))
+                val_data = (torch.tensor(raw_val['sequences'], dtype=torch.long), torch.tensor(raw_val['labels'], dtype=torch.long))
                 
             print(f"Loaded datasets from {data_dir}")
         except FileNotFoundError:
