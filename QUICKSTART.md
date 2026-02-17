@@ -1,167 +1,80 @@
 # Quick Start Guide
 
-Get started with the ML Positional Encoding project in 5 minutes!
+Here's how to get up and running with my positional encoding project.
 
-## ⚡ Setup (2 minutes)
+## Setup
 
 ```bash
-# 1. Navigate to the project
 cd ml-positional-encoding
 
-# 2. Create virtual environment
+# Create environment
 python -m venv venv
+venv\Scripts\Activate.ps1  # Windows
 
-# 3. Activate virtual environment
-# On Mac/Linux:
-source venv/bin/activate
-# On Windows PowerShell:
-venv\Scripts\Activate.ps1
-# On Windows CMD:
-# venv\Scripts\activate.bat
-
-# 4. Install dependencies
+# Install
 pip install -r requirements.txt
 ```
 
-## 🎯 Quick Test (1 minute)
-
-Verify everything works:
+## Test
 
 ```bash
-# Run tests
 python tests/test_positional_encoding.py
 ```
 
-You should see: `✓ ALL TESTS PASSED!`
-
-## 🚀 Train Your First Model (5 minutes)
+## Train
 
 ```bash
-# Train with learned absolute positional encoding
+# Train with learned absolute position encoding
 python src/train.py --pos_encoding learned_absolute --num_epochs 10
+
+# Or try other methods
+python src/train.py --pos_encoding learned_relative --num_epochs 10
+python src/train.py --pos_encoding continuous --num_epochs 10
 ```
 
-This will:
-- ✅ Create a position-aware dataset
-- ✅ Train a transformer model
-- ✅ Save results to `experiments/results/`
-- ✅ Generate training curves
-
-## 📊 View Results
-
-After training, check:
-- **Training curves**: `experiments/results/learned_absolute_d128_h8_l3/visualizations/`
-- **Checkpoints**: `experiments/results/learned_absolute_d128_h8_l3/checkpoints/`
-- **Logs**: `experiments/results/learned_absolute_d128_h8_l3/`
-
-## 🔍 Compare All Methods (30 minutes)
-
-Train and compare all positional encoding methods:
+## Compare All Methods
 
 ```bash
-python scripts/compare_all.py
+python scripts/compare_all.py --num_epochs 20
 ```
 
-This generates:
-- Comparison plots
-- Summary table (CSV)
-- Detailed markdown report
+This will train all methods and generate comparison plots.
 
-Located in: `experiments/results/`
-
-## 📋 Command Reference
-
-### Training Options
+## Common Commands
 
 ```bash
-# Different positional encodings
+# Different encodings
 python src/train.py --pos_encoding learned_absolute
 python src/train.py --pos_encoding learned_relative
 python src/train.py --pos_encoding continuous
 python src/train.py --pos_encoding sinusoidal
-python src/train.py --pos_encoding none  # Ablation study
+python src/train.py --pos_encoding none  # Ablation
 
-# Customize architecture
+# Custom architecture
 python src/train.py \
     --pos_encoding learned_absolute \
     --d_model 256 \
     --num_heads 8 \
-    --num_layers 6 \
-    --dropout 0.1
+    --num_layers 6
 
-# Adjust training
-python src/train.py \
-    --num_epochs 50 \
-    --batch_size 64 \
-    --lr 5e-4 \
-    --train_samples 10000
-
-# Use GPU (if available)
-python src/train.py --device cuda
+# Fast test
+python src/train.py --train_samples 1000 --val_samples 200 --num_epochs 5
 ```
 
-### Testing
+## Troubleshooting
 
+**"Module not found"**
 ```bash
-# Run all tests
-python tests/test_positional_encoding.py
-```
-
-## 🆘 Troubleshooting
-
-### Issue: Module not found
-
-```bash
-# Make sure you're in the right directory
 cd ml-positional-encoding
-
-# Make sure venv is activated (you should see (venv) in your terminal)
-# On Windows PowerShell:
 venv\Scripts\Activate.ps1
-
-# Reinstall dependencies
 pip install -r requirements.txt
 ```
 
-### Issue: CUDA out of memory
-
+**Training too slow**
 ```bash
-# Reduce batch size
-python src/train.py --batch_size 16
-
-# Or use CPU
-python src/train.py --device cpu
-```
-
-### Issue: Training too slow
-
-```bash
-# Reduce samples
-python src/train.py --train_samples 1000 --val_samples 200
-
-# Reduce epochs
-python src/train.py --num_epochs 10
+python src/train.py --batch_size 16 --train_samples 1000
 ```
 
 ---
 
-## 💡 Tips
-
-1. **Start simple**: Run the quick test first to verify setup
-2. **Compare methods**: The comparison script gives the best insights
-3. **Visualize**: Training curves reveal what the model learned
-4. **Document**: Take notes on what you observe
-
----
-
-## 📚 Next Steps
-
-Once you're comfortable:
-- Review README.md for complete documentation
-- Read START_HERE.md for submission instructions
-- Experiment with different architectures
-- Record your video walkthrough
-
----
-
-**Good luck with your interview! 🚀**
+**Built by Varun Reddy** | 2026
