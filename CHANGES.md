@@ -95,6 +95,14 @@ ml-positional-encoding/
 5.  **Documentation**:
     - `MODEL_CARD.md`: Industry-standard model documentation.
     - `CONTRIBUTING.md`: Developer guide.
-    - `media/VIDEO_GUIDE.md`: Script for recording video walkthrough.
+    - `CONTRIBUTING.md`: Developer guide.
+
+### Submission Readiness - February 17, 2026
+
+**Final Polish:**
+1.  **Submission Document**: Created `SUBMISSION.md` with direct answers to interview questions.
+2.  **Results**: Committed experiment results and plots (`experiments/results/`).
+3.  **Video**: Added video walkthrough `media/ml-positional-encoding.mp4`.
+4.  **Cleanup**: Removed planning artifacts.
 
 Varun Reddy | February 2026
