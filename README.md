@@ -59,6 +59,8 @@ I generated a custom **Position-Aware Dataset** to rigorously test these methods
 
 You can open `data/train/train_data.csv` in Excel to see the patterns yourself!
 
+**Note:** The training scripts (`src/train.py` and `scripts/quick_demo.py`) automatically detect and use this pre-generated data, maintaining consistency across experiments.
+
 ---
 
 ## 🛠️ Methods I Implemented

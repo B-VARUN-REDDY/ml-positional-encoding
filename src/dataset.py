@@ -9,6 +9,8 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from typing import Tuple, Optional, Dict, List
+import pickle
+from pathlib import Path
 
 
 class PositionAwarePatternDataset(Dataset):
@@ -36,7 +38,8 @@ class PositionAwarePatternDataset(Dataset):
         seq_len: int = 32,
         vocab_size: int = 20,
         num_classes: int = 3,
-        seed: Optional[int] = None
+        seed: Optional[int] = None,
+        data: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
     ):
         super().__init__()
         
@@ -57,8 +60,17 @@ class PositionAwarePatternDataset(Dataset):
             [(15, 7), (20, 4)]   # Class 2
         ]
         
-        # Generate data
-        self.sequences, self.labels = self._generate_data()
+        # Generate data or use provided data
+        if data is not None:
+            self.sequences, self.labels = data
+            # Slice if more data provided than requested
+            if len(self.sequences) > num_samples:
+                self.sequences = self.sequences[:num_samples]
+                self.labels = self.labels[:num_samples]
+            # Update num_samples based on actual data
+            self.num_samples = len(self.sequences)
+        else:
+            self.sequences, self.labels = self._generate_data()
     
     def _check_pattern(self, sequence: np.ndarray, pattern: List[Tuple[int, int]]) -> bool:
         """
@@ -302,7 +314,8 @@ def create_dataloaders(
     seq_len: int = 32,
     vocab_size: int = 20,
     num_workers: int = 0,
-    seed: Optional[int] = 42
+    seed: Optional[int] = 42,
+    data_dir: Optional[str] = None
 ) -> Tuple[DataLoader, DataLoader, Dict]:
     """
     Create train and validation dataloaders.
@@ -317,12 +330,36 @@ def create_dataloaders(
         num_workers: Number of dataloader workers
         seed: Random seed
     
+        data_dir: Optional path to data directory containing train_data.pkl/val_data.pkl
+    
     Returns:
         train_loader: Training dataloader
         val_loader: Validation dataloader
         info: Dataset information dictionary
     """
     dataset_type = dataset_type.lower()
+    
+    train_data = None
+    val_data = None
+    
+    if data_dir is not None:
+        data_path = Path(data_dir)
+        try:
+            # Load train data
+            with open(data_path / 'train' / 'train_data.pkl', 'rb') as f:
+                raw_train = pickle.load(f)
+                train_data = (torch.tensor(raw_train['sequences']), torch.tensor(raw_train['labels']))
+            
+            # Load val data
+            with open(data_path / 'val' / 'val_data.pkl', 'rb') as f:
+                raw_val = pickle.load(f)
+                val_data = (torch.tensor(raw_val['sequences']), torch.tensor(raw_val['labels']))
+                
+            print(f"Loaded datasets from {data_dir}")
+        except FileNotFoundError:
+            print(f"Data files not found in {data_dir}, falling back to generation.")
+        except Exception as e:
+            print(f"Error loading data: {e}, falling back to generation.")
     
     # Create datasets
     if dataset_type == 'pattern':
@@ -331,14 +368,16 @@ def create_dataloaders(
             seq_len=seq_len,
             vocab_size=vocab_size,
             num_classes=3,
-            seed=seed
+            seed=seed,
+            data=train_data
         )
         val_dataset = PositionAwarePatternDataset(
             num_samples=val_samples,
             seq_len=seq_len,
             vocab_size=vocab_size,
             num_classes=3,
-            seed=seed + 1 if seed is not None else None
+            seed=seed + 1 if seed is not None else None,
+            data=val_data
         )
         num_classes = 3
         info = train_dataset.get_pattern_info()

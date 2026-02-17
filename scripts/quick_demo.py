@@ -66,8 +66,10 @@ print("\n3️⃣  Testing dataset...")
 try:
     # Check physical files
     import os
+    data_dir = None
     if os.path.exists('data/train/train_data.pkl'):
-        print(f"   ✅ Data files found in data/")
+        data_dir = 'data'
+        print(f"   ✅ Data files found in data/ (using them)")
     
     train_loader, val_loader, info = create_dataloaders(
         dataset_type='pattern',
@@ -75,7 +77,8 @@ try:
         val_samples=20,
         batch_size=16,
         seq_len=32,
-        vocab_size=20
+        vocab_size=20,
+        data_dir=data_dir
     )
     
     sequences, labels = next(iter(train_loader))

@@ -339,7 +339,9 @@ def main():
                         help='Number of training samples')
     parser.add_argument('--val_samples', type=int, default=1000,
                         help='Number of validation samples')
-    
+    parser.add_argument('--data_dir', type=str, default=None,
+                        help='Path to data directory (optional)')
+
     # Training arguments
     parser.add_argument('--batch_size', type=int, default=32,
                         help='Batch size')
@@ -377,7 +379,7 @@ def main():
     config = vars(args)
     with open(output_dir / 'config.json', 'w') as f:
         json.dump(config, f, indent=2)
-    
+
     # Create dataloaders
     print("Creating datasets...")
     train_loader, val_loader, dataset_info = create_dataloaders(
@@ -387,7 +389,8 @@ def main():
         val_samples=args.val_samples,
         seq_len=args.seq_len,
         vocab_size=args.vocab_size,
-        seed=args.seed
+        seed=args.seed,
+        data_dir=args.data_dir
     )
     
     print(f"Dataset: {args.dataset_type}")

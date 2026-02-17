@@ -62,7 +62,8 @@ def compare_all_methods(
         '--vocab_size', '20',
         '--num_epochs', str(num_epochs),
         '--device', device,
-        '--output_dir', output_dir
+        '--output_dir', output_dir,
+        '--data_dir', str(Path(__file__).parent.parent / 'data')
     ]
     
     results = {}
