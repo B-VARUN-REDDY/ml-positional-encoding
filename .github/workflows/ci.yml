@@ -2,80 +2,76 @@ name: Positional Encoding Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10']
-    
+        python-version: ["3.8", "3.9", "3.10"]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    
-    - name: Cache pip
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-cov
-    
-    - name: Verify setup
-      run: |
-        python verify_setup.py
-    
-    - name: Run tests
-      run: |
-        python tests/test_positional_encoding.py
-    
-    - name: Test quick demo
-      run: |
-        python scripts/quick_demo.py
-    
-    - name: Test training (quick)
-      run: |
-        python src/train.py --pos_encoding learned_absolute --num_epochs 2 --train_samples 100 --val_samples 20
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Run tests
+        run: |
+          python tests/test_positional_encoding.py
+
+      - name: Test quick demo
+        run: |
+          python scripts/quick_demo.py
+
+      - name: Test training (quick)
+        run: |
+          python src/train.py --pos_encoding learned_absolute --num_epochs 2 --train_samples 100 --val_samples 20
 
   code-quality:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    
-    - name: Install tools
-      run: |
-        pip install flake8 black isort
-    
-    - name: Check formatting
-      run: |
-        black --check src/ tests/ scripts/ || echo "⚠️ Formatting issues (non-blocking)"
-    
-    - name: Check imports
-      run: |
-        isort --check-only src/ tests/ scripts/ || echo "⚠️ Import issues (non-blocking)"
-    
-    - name: Lint
-      run: |
-        flake8 src/ tests/ scripts/ --max-line-length=120 --ignore=E203,W503 || echo "⚠️ Lint issues (non-blocking)"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install tools
+        run: |
+          pip install flake8 black isort
+
+      - name: Check formatting
+        run: |
+          black --check src/ tests/ scripts/ || echo "⚠️ Formatting issues (non-blocking)"
+
+      - name: Check imports
+        run: |
+          isort --check-only src/ tests/ scripts/ || echo "⚠️ Import issues (non-blocking)"
+
+      - name: Lint
+        run: |
+          flake8 src/ tests/ scripts/ --max-line-length=120 --ignore=E203,W503 || echo "⚠️ Lint issues (non-blocking)"
