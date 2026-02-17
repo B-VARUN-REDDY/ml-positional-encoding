@@ -79,4 +79,23 @@ ml-positional-encoding/
 
 **All documentation now authentically represents my work.**
 
+### Latest Updates - February 16, 2026 (Part 2)
+
+**Critical Additions for Production Readiness:**
+
+1.  **Datasets Included**: Added `data/` directory with pre-generated training and validation sets in CSV and Pickle formats.
+    - `scripts/generate_datasets.py`: Variable dataset generation.
+    - `scripts/explore_data.py`: Data inspection utility.
+
+2.  **Interactive Notebook**: Added `notebooks/demo.ipynb` for live interactive demonstrations.
+
+3.  **Visualization Tools**: Added `scripts/visualize_results.py` for publication-quality plots.
+
+4.  **CI/CD Pipeline**: Added `.github/workflows/ci.yml` for automated testing.
+
+5.  **Documentation**:
+    - `MODEL_CARD.md`: Industry-standard model documentation.
+    - `CONTRIBUTING.md`: Developer guide.
+    - `media/VIDEO_GUIDE.md`: Script for recording video walkthrough.
+
 Varun Reddy | February 2026
