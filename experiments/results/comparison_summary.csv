@@ -1,0 +1,6 @@
+Method,Best Val Acc (%),Best Epoch,Final Val Acc (%),Final Train Acc (%),Improvement from No Position
+Learned Absolute,99.90,1,99.90,94.26,41.64
+Sinusoidal,97.50,1,97.50,53.02,39.24
+Continuous,86.39,1,86.39,69.73,28.13
+Learned Relative,67.97,1,67.97,60.82,9.71
+None,58.26,1,58.26,60.40,0.00
