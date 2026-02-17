@@ -100,13 +100,14 @@ try:
     )
     
     test_input = torch.randint(0, 20, (2, 32))
-    logits = model(test_input)
+    logits, _ = model(test_input)
     assert logits.shape == (2, 3)
     
     logits, attn = model(test_input, return_attention=True)
     assert attn.shape == (2, 4, 32, 32)
     
-    print(f"   ✅ Model: {model.get_num_parameters():,} parameters")
+    num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"   ✅ Model: {num_params:,} parameters")
     print(f"   ✅ Forward pass: Working")
     print(f"   ✅ Attention: Working")
 except Exception as e:
@@ -131,7 +132,7 @@ try:
         sequences, labels = sequences.to(device), labels.to(device)
         
         optimizer.zero_grad()
-        logits = model(sequences)
+        logits, _ = model(sequences)
         loss = criterion(logits, labels)
         loss.backward()
         optimizer.step()
