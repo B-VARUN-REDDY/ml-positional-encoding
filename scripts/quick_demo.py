@@ -64,6 +64,11 @@ for name, enc in encodings.items():
 # Test dataset
 print("\n3️⃣  Testing dataset...")
 try:
+    # Check physical files
+    import os
+    if os.path.exists('data/train/train_data.pkl'):
+        print(f"   ✅ Data files found in data/")
+    
     train_loader, val_loader, info = create_dataloaders(
         dataset_type='pattern',
         train_samples=100,

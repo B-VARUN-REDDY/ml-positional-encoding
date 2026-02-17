@@ -51,10 +51,10 @@ logs/
 tensorboard/
 
 # Data
-data/
-*.csv
-*.pkl
-*.pickle
+# data/ (Allow data folder)
+# *.csv (Allow csv)
+# *.pkl (Allow pkl)
+
 
 # Media
 media/*.mp4

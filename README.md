@@ -48,6 +48,19 @@ When designing deep architectures that stack self-attention layers with position
 
 ---
 
+## 📊 The Data
+
+I generated a custom **Position-Aware Dataset** to rigorously test these methods. The task is to classify sequences based on values at specific positions.
+
+**Now Included:** Pre-generated datasets in `data/` for easy inspection.
+- `data/train/`: 5,000 samples (CSV + Pickle)
+- `data/val/`: 1,000 samples
+- `data/demo/`: 100 samples
+
+You can open `data/train/train_data.csv` in Excel to see the patterns yourself!
+
+---
+
 ## 🛠️ Methods I Implemented
 
 ### 1. Learned Absolute Positional Embeddings
