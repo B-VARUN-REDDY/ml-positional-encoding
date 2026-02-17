@@ -265,7 +265,18 @@ bias = rel_bias(seq_len)
 ```
 ml-positional-encoding/
 ├── README.md                     
-├── requirements.txt              
+├── requirements.txt
+├── CHANGES.md
+├── CONTRIBUTING.md
+├── MODEL_CARD.md
+├── QUICKSTART.md
+├── LICENSE
+├── .github/
+├── media/
+├── data/
+│   ├── train/
+│   ├── val/
+│   └── demo/
 ├── src/
 │   ├── positional_encodings.py   # My encoding implementations
 │   ├── model.py                  # Transformer architecture
@@ -274,7 +285,13 @@ ml-positional-encoding/
 ├── tests/
 │   └── test_positional_encoding.py
 ├── scripts/
-│   └── compare_all.py
+│   ├── compare_all.py
+│   ├── quick_demo.py
+│   ├── generate_datasets.py
+│   ├── explore_data.py
+│   └── visualize_results.py
+├── notebooks/
+│   └── demo.ipynb
 └── experiments/
     └── results/
 ```

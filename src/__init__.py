@@ -5,7 +5,7 @@ Learnable positional encoding methods for transformer models.
 """
 
 __version__ = "1.0.0"
-__author__ = "ML Engineering Interview Submission"
+__author__ = "Varun Reddy"
 
 from .positional_encodings import (
     SinusoidalPositionalEncoding,

@@ -57,7 +57,7 @@ for name, enc in encodings.items():
     try:
         if name == 'Learned Relative':
             out = enc(seq_len)
-            assert out.shape == (1, 8, seq_len, seq_len)
+            assert out.shape == (8, seq_len, seq_len)
         else:
             out = enc(x)
             assert out.shape ==x.shape

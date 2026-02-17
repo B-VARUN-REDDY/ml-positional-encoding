@@ -56,14 +56,14 @@ def save_dataset(dataset, output_dir, name):
                 'patterns': dataset.patterns
             }
         }, f)
-    print(f"  ✅ Saved pickle: {pkl_path}")
+    print(f"  [OK] Saved pickle: {pkl_path}")
 
     # 3. Save as CSV (For inspection)
     df = pd.DataFrame(sequences, columns=[f'pos_{i}' for i in range(sequences.shape[1])])
     df.insert(0, 'label', labels)
     csv_path = output_dir / f"{name}_data.csv"
     df.to_csv(csv_path, index=False)
-    print(f"  ✅ Saved CSV: {csv_path}")
+    print(f"  [OK] Saved CSV: {csv_path}")
 
     # 4. Save Human-Readable Samples (TXT)
     txt_path = output_dir / "sample_sequences.txt"
@@ -102,7 +102,7 @@ def save_dataset(dataset, output_dir, name):
                         seq_str += f" {val_str}  "
                 f.write(f"Sample {idx+1}: {seq_str}\n")
 
-    print(f"  ✅ Saved description: {txt_path}")
+    print(f"  [OK] Saved description: {txt_path}")
     
     # Save Metadata
     meta_path = output_dir / "dataset_info.json"
@@ -111,7 +111,8 @@ def save_dataset(dataset, output_dir, name):
             'num_samples': len(dataset),
             'num_classes': dataset.num_classes,
             'vocab_size': dataset.vocab_size,
-            'seq_len': dataset.seq_len
+            'seq_len': dataset.seq_len,
+            'patterns': [[list(p) for p in pat] for pat in dataset.patterns]  # Convert tuples to lists
         }, f, indent=2)
 
 
