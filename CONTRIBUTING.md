@@ -20,7 +20,6 @@ If you want to run this locally, here's how I set up my environment:
 3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
-   pip install pytest flake8 black  # dev tools
    ```
 
 ## Testing
@@ -28,6 +27,8 @@ If you want to run this locally, here's how I set up my environment:
 I've included a comprehensive test suite. Before submitting any changes, please ensure all tests pass:
 
 ```bash
+pytest
+# or
 python tests/test_positional_encoding.py
 ```
 
